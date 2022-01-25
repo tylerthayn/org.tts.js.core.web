@@ -13,6 +13,21 @@ module.exports = function(grunt) {
 		code = Config()
 		code += sep + RequireJs()
 		code += sep + Plugins()
+
+		// Style Files
+		Fs.readdirSync('./src/styles').forEach(file => {
+			grunt.log.write(file)
+
+			let style = Fs.readFileSync('./src/styles/'+file, 'utf-8')
+			code += sep + 'AddStyle(`'+style+'`)'
+
+			grunt.log.ok()
+		})
+		//code += sep + BootstrapStyle()
+		//code += sep + jQueryUiStyle()
+		//code += sep + TTSStyle()
+
+		// Script Files
 		code += sep + Lodash()
 		code += sep + jQuery()
 		code += sep + jQueryUi()
@@ -62,9 +77,10 @@ module.exports = function(grunt) {
 	}
 
 	function Core () {
-		grunt.log.write('Preparing org-tts-js-core...')
-		let file = require.resolve('org-tts-js-core')
+		grunt.log.write('Preparing @tyler.thayn/js.core...')
+		let file = require.resolve('@tyler.thayn/js.core')
 		let src = Fs.readFileSync(file, 'utf-8')
+		src = src.replace(/define\(('|").+('|"),/, 'define(\'@js/core\',')
 		grunt.log.ok()
 		return src
 	}

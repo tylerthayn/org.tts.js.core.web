@@ -3,10 +3,24 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>org.tts.js.core.web</title>
-		<script src="../dist/org.tts.js.core.web.js" data-basedir="" data-main="test"></script>
+		<script src="../dist/js.core.web.js" data-basedir="" data-main="test" data-start="Start"></script>
+		<script>
+			document.addEventListener('web-ready', function (e) {
+				typeof $ !== 'undefined' && log($)
+				typeof bootstrap !== 'undefined' && log(bootstrap)
+				Extend(window, e.detail)
+				typeof $ !== 'undefined' && log($)
+				typeof bootstrap !== 'undefined' && log(bootstrap)
+			})
+
+			function Start ($, bootstrap) {
+				console.log(arguments)
+			}
+
+		</script>
 	</head>
 	<body class="TTS App">
-		
+		<i class="material-icons">face</i>
 	</body>
 </html>
 

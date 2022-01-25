@@ -1,6 +1,29 @@
-let baseDir = document.currentScript.hasAttribute('data-basedir') ? document.currentScript.getAttribute('data-basedir') : document.currentScript.getAttribute('src').split('/').reverse().slice(1).reverse().join('/')
+function GetBaseDir () {
+	let host = ''
+	if (!!document.currentScript && document.currentScript.hasAttribute('data-host')) {
+		host = document.currentScript.getAttribute('data-host')
+	} else {
+		host = location.protocol + '//' + location.host
+		if (location.port != '') {
+			host += ':'+location.port
+		}
+	}
+	baseDir = new URL(host.endsWith('/') ? host : host + '/')
+
+	if (!!document.currentScript && document.currentScript.hasAttribute('data-dir')) {
+		baseDir.pathname = document.currentScript.getAttribute('data-dir')
+	} else {
+		let pieces = location.pathname.split(/(#|\?)/).shift().split(/\//g)
+		if (pieces[pieces.length-1].includes('.')) {pieces.pop()}
+		baseDir.pathname = pieces.join('/')
+	}
+	return baseDir.toString()
+}
+
+
+
 require = {
-	baseUrl: baseDir,
+	baseUrl: GetBaseDir(),
 	paths: {
 		'@css': './styles'
 	},
@@ -21,7 +44,7 @@ require = {
 		}
 	},
 	deps: [
-		'style!@css/org.tts'
+		//'style!@css/org.tts'
 	],
 	skipDataMain: true
 }

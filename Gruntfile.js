@@ -7,8 +7,8 @@ module.exports = function(grunt) {
 			options: {
 				src: './src',
 				dir: './dist',
-				file: 'org.tts.js.core.web.js',
-				min: 'org.tts.js.core.web.min.js'
+				file: 'js.core.web.js',
+				min: 'js.core.web.min.js'
 			}
 		}
 	}
