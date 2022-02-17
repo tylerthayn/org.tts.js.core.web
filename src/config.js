@@ -1,50 +1,40 @@
-function GetBaseDir () {
-	let host = ''
-	if (!!document.currentScript && document.currentScript.hasAttribute('data-host')) {
-		host = document.currentScript.getAttribute('data-host')
-	} else {
-		host = location.protocol + '//' + location.host
-		if (location.port != '') {
-			host += ':'+location.port
+window.Path=function(){function assertPath(path){if('string'!=typeof path)throw new TypeError('Path must be a string. Received '+JSON.stringify(path))}function normalizeStringPosix(path,allowAboveRoot){var res='';var lastSegmentLength=0;var lastSlash=-1;var dots=0;var code;for(var i=0;i<=path.length;++i){if(i<path.length)code=path.charCodeAt(i);else{if(47===code)break;code=47}if(47===code){if(lastSlash===i-1||1===dots);else if(lastSlash!==i-1&&2===dots){if(res.length<2||2!==lastSegmentLength||46!==res.charCodeAt(res.length-1)||46!==res.charCodeAt(res.length-2))if(res.length>2){var lastSlashIndex=res.lastIndexOf('/');if(lastSlashIndex!==res.length-1){if(-1===lastSlashIndex){res='';lastSegmentLength=0}else lastSegmentLength=(res=res.slice(0,lastSlashIndex)).length-1-res.lastIndexOf('/');lastSlash=i;dots=0;continue}}else if(2===res.length||1===res.length){res='';lastSegmentLength=0;lastSlash=i;dots=0;continue}if(allowAboveRoot){res.length>0?res+='/..':res='..';lastSegmentLength=2}}else{res.length>0?res+='/'+path.slice(lastSlash+1,i):res=path.slice(lastSlash+1,i);lastSegmentLength=i-lastSlash-1}lastSlash=i;dots=0}else 46===code&&-1!==dots?++dots:dots=-1}return res}function _format(sep,pathObject){var dir=pathObject.dir||pathObject.root;var base=pathObject.base||(pathObject.name||'')+(pathObject.ext||'');return dir?dir===pathObject.root?dir+base:dir+sep+base:base}var posix={resolve:function resolve(){var resolvedPath='';var resolvedAbsolute=false;var cwd;for(var i=arguments.length-1;i>=-1&&!resolvedAbsolute;i--){var path;if(i>=0)path=arguments[i];else{void 0===cwd&&(cwd=process.cwd());path=cwd}assertPath(path);if(0!==path.length){resolvedPath=path+'/'+resolvedPath;resolvedAbsolute=47===path.charCodeAt(0)}}resolvedPath=normalizeStringPosix(resolvedPath,!resolvedAbsolute);return resolvedAbsolute?resolvedPath.length>0?'/'+resolvedPath:'/':resolvedPath.length>0?resolvedPath:'.'},normalize:function normalize(path){assertPath(path);if(0===path.length)return'.';var isAbsolute=47===path.charCodeAt(0);var trailingSeparator=47===path.charCodeAt(path.length-1);0!==(path=normalizeStringPosix(path,!isAbsolute)).length||isAbsolute||(path='.');path.length>0&&trailingSeparator&&(path+='/');return isAbsolute?'/'+path:path},isAbsolute:function isAbsolute(path){assertPath(path);return path.length>0&&47===path.charCodeAt(0)},join:function join(){if(0===arguments.length)return'.';var joined;for(var i=0;i<arguments.length;++i){var arg=arguments[i];assertPath(arg);arg.length>0&&(void 0===joined?joined=arg:joined+='/'+arg)}return void 0===joined?'.':posix.normalize(joined)},relative:function relative(from,to){assertPath(from);assertPath(to);if(from===to)return'';if((from=posix.resolve(from))===(to=posix.resolve(to)))return'';var fromStart=1;for(;fromStart<from.length;++fromStart)if(47!==from.charCodeAt(fromStart))break;var fromEnd=from.length;var fromLen=fromEnd-fromStart;var toStart=1;for(;toStart<to.length;++toStart)if(47!==to.charCodeAt(toStart))break;var toLen=to.length-toStart;var length=fromLen<toLen?fromLen:toLen;var lastCommonSep=-1;var i=0;for(;i<=length;++i){if(i===length){if(toLen>length){if(47===to.charCodeAt(toStart+i))return to.slice(toStart+i+1);if(0===i)return to.slice(toStart+i)}else fromLen>length&&(47===from.charCodeAt(fromStart+i)?lastCommonSep=i:0===i&&(lastCommonSep=0));break}var fromCode=from.charCodeAt(fromStart+i);if(fromCode!==to.charCodeAt(toStart+i))break;47===fromCode&&(lastCommonSep=i)}var out='';for(i=fromStart+lastCommonSep+1;i<=fromEnd;++i)i!==fromEnd&&47!==from.charCodeAt(i)||(0===out.length?out+='..':out+='/..');if(out.length>0)return out+to.slice(toStart+lastCommonSep);toStart+=lastCommonSep;47===to.charCodeAt(toStart)&&++toStart;return to.slice(toStart)},_makeLong:function _makeLong(path){return path},dirname:function dirname(path){assertPath(path);if(0===path.length)return'.';var code=path.charCodeAt(0);var hasRoot=47===code;var end=-1;var matchedSlash=true;for(var i=path.length-1;i>=1;--i)if(47===(code=path.charCodeAt(i))){if(!matchedSlash){end=i;break}}else matchedSlash=false;return-1===end?hasRoot?'/':'.':hasRoot&&1===end?'//':path.slice(0,end)},basename:function basename(path,ext){if(void 0!==ext&&'string'!=typeof ext)throw new TypeError('"ext" argument must be a string');assertPath(path);var start=0;var end=-1;var matchedSlash=true;var i;if(void 0!==ext&&ext.length>0&&ext.length<=path.length){if(ext.length===path.length&&ext===path)return'';var extIdx=ext.length-1;var firstNonSlashEnd=-1;for(i=path.length-1;i>=0;--i){var code=path.charCodeAt(i);if(47===code){if(!matchedSlash){start=i+1;break}}else{if(-1===firstNonSlashEnd){matchedSlash=false;firstNonSlashEnd=i+1}if(extIdx>=0)if(code===ext.charCodeAt(extIdx))-1==--extIdx&&(end=i);else{extIdx=-1;end=firstNonSlashEnd}}}start===end?end=firstNonSlashEnd:-1===end&&(end=path.length);return path.slice(start,end)}for(i=path.length-1;i>=0;--i)if(47===path.charCodeAt(i)){if(!matchedSlash){start=i+1;break}}else if(-1===end){matchedSlash=false;end=i+1}return-1===end?'':path.slice(start,end)},extname:function extname(path){assertPath(path);var startDot=-1;var startPart=0;var end=-1;var matchedSlash=true;var preDotState=0;for(var i=path.length-1;i>=0;--i){var code=path.charCodeAt(i);if(47!==code){if(-1===end){matchedSlash=false;end=i+1}46===code?-1===startDot?startDot=i:1!==preDotState&&(preDotState=1):-1!==startDot&&(preDotState=-1)}else if(!matchedSlash){startPart=i+1;break}}return-1===startDot||-1===end||0===preDotState||1===preDotState&&startDot===end-1&&startDot===startPart+1?'':path.slice(startDot,end)},format:function format(pathObject){if(null===pathObject||'object'!=typeof pathObject)throw new TypeError('The "pathObject" argument must be of type Object. Received type '+typeof pathObject);return _format('/',pathObject)},parse:function parse(path){assertPath(path);var ret={root:'',dir:'',base:'',ext:'',name:''};if(0===path.length)return ret;var code=path.charCodeAt(0);var isAbsolute=47===code;var start;if(isAbsolute){ret.root='/';start=1}else start=0;var startDot=-1;var startPart=0;var end=-1;var matchedSlash=true;var i=path.length-1;var preDotState=0;for(;i>=start;--i)if(47!==(code=path.charCodeAt(i))){if(-1===end){matchedSlash=false;end=i+1}46===code?-1===startDot?startDot=i:1!==preDotState&&(preDotState=1):-1!==startDot&&(preDotState=-1)}else if(!matchedSlash){startPart=i+1;break}if(-1===startDot||-1===end||0===preDotState||1===preDotState&&startDot===end-1&&startDot===startPart+1)-1!==end&&(ret.base=ret.name=0===startPart&&isAbsolute?path.slice(1,end):path.slice(startPart,end));else{if(0===startPart&&isAbsolute){ret.name=path.slice(1,startDot);ret.base=path.slice(1,end)}else{ret.name=path.slice(startPart,startDot);ret.base=path.slice(startPart,end)}ret.ext=path.slice(startDot,end)}startPart>0?ret.dir=path.slice(0,startPart-1):isAbsolute&&(ret.dir='/');return ret},sep:'/',delimiter:':',win32:null,posix:null};return posix}()
+
+function BasePath () {
+	let host = '', dir = ''
+	if (document.currentScript) {
+		if (document.currentScript.hasAttribute('data-host')) {
+			host = document.currentScript.getAttribute('data-host')
+			if (document.currentScript.hasAttribute('data-dir')) {
+				dir = document.currentScript.getAttribute('data-dir')
+			}
+		} else {
+			host = location.origin + '/' + Path.dirname(location.pathname)
+			if (document.currentScript.hasAttribute('data-dir')) {
+				dir = document.currentScript.getAttribute('data-dir')
+			} else {
+				dir = Path.dirname(document.currentScript.getAttribute('src'))
+			}
 		}
 	}
-	baseDir = new URL(host.endsWith('/') ? host : host + '/')
-
-	if (!!document.currentScript && document.currentScript.hasAttribute('data-dir')) {
-		baseDir.pathname = document.currentScript.getAttribute('data-dir')
-	} else {
-		let pieces = location.pathname.split(/(#|\?)/).shift().split(/\//g)
-		if (pieces[pieces.length-1].includes('.')) {pieces.pop()}
-		baseDir.pathname = pieces.join('/')
-	}
-	return baseDir.toString()
+	return Path.join(host, dir.replace(/^(\.+\/)+/g, ''))
 }
 
-
-
 require = {
-	baseUrl: GetBaseDir(),
+	baseUrl: BasePath(),
 	paths: {
-		'@css': './styles'
-	},
-	map: {
-		'*': {
-			'@js/core': 'org.tts.js.core'
-		}
+		'@css': './styles',
+		'@styles': './src',
+		'@ui': './src'
 	},
 	shim: {
 		'bootstrap': {
-			'deps': ['jquery', 'style!@css/bootstrap']
+			'deps': ['jquery']
 		},
 		'jquery-ui': {
-			'deps': ['jquery', 'style!@css/jquery-ui']
-		},
-		'style!@css/org.tts': {
-			'deps': ['bootstrap']
+			'deps': ['jquery']
 		}
 	},
-	deps: [
-		//'style!@css/org.tts'
-	],
+	deps: [],
 	skipDataMain: true
 }
